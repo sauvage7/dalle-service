@@ -46,8 +46,20 @@ dalles = {}
 for name, model_path in models.items():
     assert Path(model_path).exists(), 'trained DALL-E '+model_path+' must exist'
     load_obj = torch.load(model_path)
-    dalle_params, _, weights = load_obj.pop('hparams'), load_obj.pop('vae_params'), load_obj.pop('weights')
-    dalle_params.pop('vae', None) # cleanup later
+    
+    
+    dalle_params = dict(
+        num_text_tokens = 10000,
+        text_seq_len = 80,
+        dim = 256,
+        depth = 8,
+        heads = 8,
+        dim_head = 64,
+        attn_types = ('full', 'sparse'),
+        reversible = 0
+    )
+    _, weights = load_obj.pop('vae_params'), load_obj.pop('weights')
+    #dalle_params.pop('vae', None) # cleanup later
     
     dalle = DALLE(vae = vae, **dalle_params).cuda()
     
